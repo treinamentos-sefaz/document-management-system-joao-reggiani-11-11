@@ -3,6 +3,7 @@ const documentRoutes = require('./routes/documentRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '127.0.0.1';
 
 app.use(express.json());
 
@@ -39,7 +40,7 @@ app.use((error, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(PORT, () => {
+  app.listen(PORT, HOST, () => {
     console.log(`DMS backend ouvindo na porta ${PORT}`);
   });
 }

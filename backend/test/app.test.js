@@ -3,12 +3,19 @@ const assert = require('node:assert');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const app = require('../src/app');
+const { sanitizeOriginalName } = require('../src/utils/fileName');
 
 // Teste de fumaça do seed: garante que o app Express foi exportado.
 // Novos testes serão adicionados durante os Steps 2, 6 e 7 com auxílio do Copilot.
 test('o app backend é exportado', () => {
   assert.ok(app, 'o app deve estar definido');
   assert.strictEqual(typeof app, 'function', 'o app Express deve ser uma função');
+});
+
+test('nomes originais não preservam caminhos nem caracteres de controle', () => {
+  assert.strictEqual(sanitizeOriginalName('../../relatorio\n.txt'), 'relatorio.txt');
+  assert.strictEqual(sanitizeOriginalName('..\\documento.pdf'), 'documento.pdf');
+  assert.strictEqual(sanitizeOriginalName('  \u0000  '), 'document');
 });
 
 test('upload, listagem e download seguem os contratos da API', async () => {
@@ -69,6 +76,12 @@ test('upload, listagem e download seguem os contratos da API', async () => {
     const notFoundResponse = await fetch(`${baseUrl}/documents/unknown-id/download`);
     assert.strictEqual(notFoundResponse.status, 404);
     assert.strictEqual((await notFoundResponse.json()).error.code, 'DOCUMENT_NOT_FOUND');
+
+    const traversalResponse = await fetch(
+      `${baseUrl}/documents/${encodeURIComponent('../../etc/passwd')}/download`,
+    );
+    assert.strictEqual(traversalResponse.status, 404);
+    assert.strictEqual((await traversalResponse.json()).error.code, 'DOCUMENT_NOT_FOUND');
 
     const oversizedForm = new FormData();
     oversizedForm.append(

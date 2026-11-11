@@ -41,7 +41,7 @@ Entregar uma aplicação web simples para armazenar documentos no filesystem loc
 | --- | --- |
 | RNF-01 | Os arquivos são gravados exclusivamente no filesystem local em `backend/storage`, usando Multer com `diskStorage`. Não utilizar armazenamento externo. |
 | RNF-02 | Os metadados ficam em memória e são perdidos ao reiniciar o processo. Os arquivos no disco permanecem, mas sem metadados correspondentes não são listáveis ou baixáveis pela API. A limpeza de arquivos órfãos não faz parte desta fase. |
-| RNF-03 | A configuração operacional deve vir de variáveis de ambiente. `PORT` define a porta do backend (padrão `3000`) e `MAX_UPLOAD_SIZE_BYTES` define o limite por arquivo (padrão `10485760`, equivalente a 10 MiB). |
+| RNF-03 | A configuração operacional deve vir de variáveis de ambiente. `HOST` define a interface de escuta do backend (padrão `127.0.0.1`), `PORT` define a porta (padrão `3000`) e `MAX_UPLOAD_SIZE_BYTES` define o limite por arquivo (padrão `10485760`, equivalente a 10 MiB). |
 | RNF-04 | O nome físico do arquivo é gerado pelo servidor a partir de um identificador único; não utilizar o nome fornecido pelo cliente como caminho de gravação. O caminho local nunca é exposto pela API. |
 | RNF-05 | Erros HTTP são retornados em JSON com código e mensagem compreensível, sem caminhos locais, stack traces ou detalhes internos. Downloads bem-sucedidos retornam o conteúdo binário. |
 | RNF-06 | O backend usa Node.js e Express em CommonJS; o frontend usa React e Vite em ESM. Os testes do backend usam `node:test`. |

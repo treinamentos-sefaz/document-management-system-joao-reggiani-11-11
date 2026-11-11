@@ -1,8 +1,6 @@
 import { useRef, useState } from 'react';
 import { uploadDocument } from '../services/documentApi.js';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
 export default function UploadComponent({ onUploadSuccess }) {
   const inputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -15,11 +13,6 @@ export default function UploadComponent({ onUploadSuccess }) {
       setMessage({ type: 'error', text: 'Selecione um arquivo para enviar.' });
       return;
     }
-    if (file.size > MAX_FILE_SIZE) {
-      setMessage({ type: 'error', text: 'O arquivo excede o limite de 10 MB.' });
-      return;
-    }
-
     setIsUploading(true);
     setMessage(null);
     try {
@@ -39,7 +32,7 @@ export default function UploadComponent({ onUploadSuccess }) {
       <div className="upload-copy">
         <span className="section-index">01 / ENVIAR</span>
         <h2 id="upload-heading">Adicionar documento</h2>
-        <p>Qualquer formato, até 10 MB.</p>
+        <p>Qualquer formato, limite definido pelo servidor.</p>
       </div>
       <form className="upload-form" onSubmit={handleSubmit}>
         <label className="file-picker">

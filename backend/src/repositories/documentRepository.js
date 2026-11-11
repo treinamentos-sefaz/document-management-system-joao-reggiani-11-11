@@ -1,13 +1,12 @@
 const documents = new Map();
 
-function add(document, storagePath) {
-  documents.set(document.id, { ...document, storagePath });
+function add(document) {
+  documents.set(document.id, document);
   return document;
 }
 
 function list() {
   return Array.from(documents.values())
-    .map(({ storagePath, ...document }) => document)
     .sort((left, right) => right.uploadedAt.localeCompare(left.uploadedAt));
 }
 

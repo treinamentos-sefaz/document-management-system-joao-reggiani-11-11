@@ -1,20 +1,30 @@
-const fs = require('node:fs/promises');
+const path = require('node:path');
 const documentRepository = require('../repositories/documentRepository');
+const localFileRepository = require('../repositories/localFileRepository');
+const { sanitizeOriginalName } = require('../utils/fileName');
 
 async function createDocument(file) {
+  const storagePath = localFileRepository.getStoragePath(file.filename);
+  if (!storagePath || path.resolve(file.path) !== storagePath) {
+    const error = new Error('Invalid upload storage path.');
+    error.statusCode = 500;
+    error.apiCode = 'STORAGE_ERROR';
+    throw error;
+  }
+
   const document = {
     id: file.filename,
-    originalName: file.originalname,
+    originalName: sanitizeOriginalName(file.originalname),
     size: file.size,
     uploadedAt: new Date().toISOString(),
     owner: 'local',
   };
 
   try {
-    documentRepository.add(document, file.path);
+    documentRepository.add(document);
     return document;
   } catch (error) {
-    await fs.unlink(file.path).catch(() => {});
+    await localFileRepository.removeFile(file.filename).catch(() => {});
     error.statusCode = 500;
     error.apiCode = 'STORAGE_ERROR';
     throw error;
@@ -31,26 +41,16 @@ async function getDocumentFile(id) {
     return null;
   }
 
-  try {
-    const fileStats = await fs.stat(document.storagePath);
-    if (!fileStats.isFile()) {
-      return null;
-    }
-
-    return {
-      filePath: document.storagePath,
-      originalName: document.originalName,
-      size: fileStats.size,
-    };
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-
-    error.statusCode = 500;
-    error.apiCode = 'STORAGE_ERROR';
-    throw error;
+  const storedFile = await localFileRepository.getStoredFile(id);
+  if (!storedFile) {
+    return null;
   }
+
+  return {
+    filePath: storedFile.filePath,
+    originalName: document.originalName,
+    size: storedFile.size,
+  };
 }
 
 module.exports = {

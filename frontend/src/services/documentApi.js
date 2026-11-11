@@ -47,5 +47,5 @@ export async function downloadDocument(document) {
   window.document.body.append(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(downloadUrl);
+  window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 }

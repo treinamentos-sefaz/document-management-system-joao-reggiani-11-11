@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Instalar dependencias do backend
+        run: npm install --no-audit --no-fund
+        working-directory: backend
+
+      - name: Instalar dependencias do frontend
+        run: npm install --no-audit --no-fund
+        working-directory: frontend
+
+      - name: Build do frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Testes do backend
+        run: npm test
+        working-directory: backend

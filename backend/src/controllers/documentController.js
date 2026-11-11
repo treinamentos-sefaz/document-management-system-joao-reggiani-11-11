@@ -33,14 +33,7 @@ async function download(req, res, next) {
       return sendError(res, 404, 'DOCUMENT_NOT_FOUND', 'Documento não encontrado.');
     }
 
-    const downloadName = file.originalName
-      .replace(/\\/g, '/')
-      .split('/')
-      .pop()
-      .replace(/[\u0000-\u001f\u007f]/g, '')
-      .trim() || 'document';
-
-    res.download(file.filePath, downloadName, {
+    res.download(file.filePath, file.originalName, {
       headers: {
         'Content-Type': 'application/octet-stream',
         'Content-Length': String(file.size),
